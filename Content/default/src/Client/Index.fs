@@ -58,7 +58,10 @@ let containerBox (model: Model) (dispatch: Msg -> unit) =
         Bulma.content [
             Html.ol [
                 for todo in model.Todos do
-                    Html.li [ prop.text todo.Description ]
+                    Html.li [
+                        prop.classes ["text-red-200"]
+                        prop.text todo.Description
+                    ]
             ]
         ]
         Bulma.field.div [
