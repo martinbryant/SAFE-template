@@ -14,6 +14,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
-    - name: Restore tools ${{ github.action_ref }}
-      run: echo ${{ github.ref_name}}
+    - name: Restore tools 
+      run: echo This is the tag and therefore on dotnet nuget pack use flag -p:PackageVersion=${{ github.ref_name }}
     
