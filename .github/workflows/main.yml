@@ -16,6 +16,6 @@ jobs:
         dotnet-version: 8.0.x
         
     - name: nuget
-      run: echo This is the tag and therefore on dotnet nuget pack use flag -p:PackageVersion=${{ github.ref_name }} url ${{ github.event.release.html_url }} body ${{ github.event.release.body }}
+      run: echo This is the tag and therefore on dotnet nuget pack use flag -p:PackageVersion=${{ github.ref_name }} url ${{ github.event.release.html_url }} body '${{ github.event.release.body }}'
     
     
