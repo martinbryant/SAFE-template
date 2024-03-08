@@ -1,0 +1,41 @@
+name: SAFE Template release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Tool restore
+          run: dotnet tool restore
+
+        - name: Pack
+          run: dotnet pack --configuration Release -p:PackageVersion=${{ github.ref_name }} -p:PackageReleaseNotes=${{ github.event.release.html_url }} --output .
+
+        - name: Install template
+          run: dotnet new install SAFE.Template.${{ github.ref_name }}.nupkg
+
+    #      - name: Publish
+    #        run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+
+  release-2:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Tool restore
+        run: dotnet tool restore
+
+      - name: Pack
+        env:
+          VERSION: ${{ github.ref_name }}
+          RELEASE_NOTES_URL: ${{ github.event.release.html_url }}
+        run: dotnet run --project Build.fsproj -- Prerelease

@@ -29,22 +29,26 @@ Target.create "Clean" (fun _ ->
 let msBuildParams msBuildParameter: MSBuild.CliArguments = { msBuildParameter with DisableInternalBinLog = true }
 
 Target.create "Pack" (fun _ ->
-    Shell.regexReplaceInFileWithEncoding
-        "  \"name\": .+,"
-        ("  \"name\": \"" + templateName + " v" + release.NugetVersion + "\",")
-        Text.Encoding.UTF8
-        templatePath
+    // Shell.regexReplaceInFileWithEncoding
+    //     "  \"name\": .+,"
+    //     ("  \"name\": \"" + templateName + " v" + release.NugetVersion + "\",")
+    //     Text.Encoding.UTF8
+    //     templatePath
+    let version = Environment.environVarOrDefault "VERSION" ""
+    let releaseNotesUrl = Environment.environVarOrDefault "RELEASE_NOTES_URL" ""
+
     DotNet.pack
         (fun args ->
             { args with
+                    Configuration = DotNet.BuildConfiguration.Release
                     OutputPath = Some nupkgDir
                     MSBuildParams = msBuildParams args.MSBuildParams
                     Common =
                         { args.Common with
                             CustomParams =
                                 Some (sprintf "/p:PackageVersion=%s /p:PackageReleaseNotes=\"%s\""
-                                        release.NugetVersion
-                                        formattedRN) }
+                                        version
+                                        releaseNotesUrl) }
             })
         templateProj
 )
@@ -76,26 +80,7 @@ Target.create "Tests" (fun _ ->
     if not result.OK then failwithf "`dotnet %s %s` failed" cmd args
 )
 
-Target.create "Push" (fun _ ->
-    let args = $"push %s{nupkgPath} --url https://www.nuget.org"
-    run "dotnet" $"paket push %s{nupkgPath} --url https://www.nuget.org" "."
-
-    let commitMsg = sprintf "Bumping version to %O" release.NugetVersion
-    let tagName = string release.NugetVersion
-
-    Git.Branches.checkout "" false "master"
-    Git.CommandHelper.directRunGitCommand "" "fetch origin" |> ignore
-    Git.CommandHelper.directRunGitCommand "" "fetch origin --tags" |> ignore
-
-    Git.Staging.stageAll ""
-    Git.Commit.exec "" commitMsg
-    Git.Branches.pushBranch "" "origin" "master"
-
-    Git.Branches.tag "" tagName
-    Git.Branches.pushTag "" "origin" tagName
-)
-
-Target.create "Release" ignore
+Target.create "PreRelease" ignore
 
 open Fake.Core.TargetOperators
 
@@ -103,8 +88,7 @@ open Fake.Core.TargetOperators
     ==> "Pack"
     ==> "Install"
     =?> ("Tests", not skipTests)
-    ==> "Push"
-    ==> "Release"
+    ==> "PreRelease"
 |> ignore
 
 [<EntryPoint>]
