@@ -85,9 +85,9 @@ Target.create "PreRelease" ignore
 open Fake.Core.TargetOperators
 
 "Clean"
+    =?> ("Tests", not skipTests)
     ==> "Pack"
     ==> "Install"
-    =?> ("Tests", not skipTests)
     ==> "PreRelease"
 |> ignore
 
