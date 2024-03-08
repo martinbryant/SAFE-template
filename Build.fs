@@ -30,11 +30,11 @@ Target.create "Clean" (fun _ ->
 let msBuildParams msBuildParameter: MSBuild.CliArguments = { msBuildParameter with DisableInternalBinLog = true }
 
 Target.create "Pack" (fun _ ->
-    // Shell.regexReplaceInFileWithEncoding
-    //     "  \"name\": .+,"
-    //     ("  \"name\": \"" + templateName + " v" + release.NugetVersion + "\",")
-    //     Text.Encoding.UTF8
-    //     templatePath
+    Shell.regexReplaceInFileWithEncoding
+        "  \"name\": .+,"
+        ("  \"name\": \"" + templateName + " v" + version + "\",")
+        Text.Encoding.UTF8
+        templatePath
     let releaseNotesUrl = Environment.environVarOrDefault "RELEASE_NOTES_URL" ""
 
     DotNet.pack

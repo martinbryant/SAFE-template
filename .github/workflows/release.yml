@@ -38,4 +38,8 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
           RELEASE_NOTES_URL: ${{ github.event.release.html_url }}
+          RELEASE_NOTES_BODY: ${{ github.event.release.body }}
         run: dotnet run --project Build.fsproj -- Prerelease
+
+#      - name: Publish
+#        run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
