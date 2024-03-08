@@ -14,8 +14,9 @@ let release = ReleaseNotes.load "RELEASE_NOTES.md"
 let templatePath = "./Content/.template.config/template.json"
 let templateProj = "SAFE.Template.proj"
 let templateName = "SAFE-Stack Web App"
+let version = Environment.environVarOrDefault "VERSION" ""
 let nupkgDir = Path.getFullName "./nupkg"
-let nupkgPath = System.IO.Path.Combine(nupkgDir, $"SAFE.Template.%s{release.NugetVersion}.nupkg")
+let nupkgPath = System.IO.Path.Combine(nupkgDir, $"SAFE.Template.%s{version}.nupkg")
 
 let formattedRN =
     release.Notes
@@ -34,7 +35,6 @@ Target.create "Pack" (fun _ ->
     //     ("  \"name\": \"" + templateName + " v" + release.NugetVersion + "\",")
     //     Text.Encoding.UTF8
     //     templatePath
-    let version = Environment.environVarOrDefault "VERSION" ""
     let releaseNotesUrl = Environment.environVarOrDefault "RELEASE_NOTES_URL" ""
 
     DotNet.pack
